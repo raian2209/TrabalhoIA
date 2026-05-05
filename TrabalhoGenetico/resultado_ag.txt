@@ -1,0 +1,24 @@
+Algoritmo Genetico Binario - Resultado Final
+
+Funcao: f(x, y) = |e^(-x) - y^2 + 1| + 10^-4
+Intervalo de busca: [-10.0, 10.0]
+Precisao desejada: 0.005
+Resolucao obtida pela codificacao: 0.004884
+Bits por variavel: 12
+Total de bits do cromossomo: 24
+
+Parametros usados:
+- tamanho_populacao: 80
+- taxa_crossover: 0.9
+- taxa_mutacao: 0.01
+- tamanho_torneio: 3
+- elitismo: 2
+- maximo_geracoes: 250
+- limite_estagnacao: 60
+- seed: 42
+
+Geracoes executadas: 86
+Melhor cromossomo: 000000000000100000000000
+Melhor x: -10.000000
+Melhor y: 0.002442
+Melhor fitness: 22027.465889

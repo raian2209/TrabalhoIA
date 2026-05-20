@@ -1,0 +1,7 @@
+entrada_1,entrada_2,probabilidade,classe_prevista,descricao
+0.22,0.18,0.000000,0,Fruta pequena de teste
+0.52,0.56,0.995851,1,Fruta na borda positiva
+0.90,0.88,1.000000,1,Fruta excelente de teste
+0.78,0.22,0.012054,0,Fruta pesada mas fina de teste
+0.15,0.75,0.000734,0,Fruta leve mas larga de teste
+0.62,0.58,0.999984,1,Fruta boa de teste

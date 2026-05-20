@@ -1,0 +1,69 @@
+{
+  "description": "MLP treinada para classificacao binaria de frutas.",
+  "architecture": {
+    "input_size": 2,
+    "hidden_size": 5,
+    "output_size": 1,
+    "activation": "sigmoid"
+  },
+  "training": {
+    "learning_rate": 0.5,
+    "epochs": 20000,
+    "report_every": 2000,
+    "seed": 42,
+    "final_mse": 7.155553989166921e-05,
+    "threshold": 0.5
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "true_positive": 10.0,
+    "true_negative": 10.0,
+    "false_positive": 0.0,
+    "false_negative": 0.0
+  },
+  "weights_input_hidden": [
+    [
+      6.966007444428908,
+      -11.16885677250619,
+      -3.0486267119684722,
+      1.9823689947410228,
+      -5.554479607577659
+    ],
+    [
+      6.626167923096332,
+      -0.5584400250343012,
+      -4.198280953641229,
+      2.188111568508818,
+      -12.514990472267364
+    ]
+  ],
+  "bias_hidden": [
+    -6.601482506638459,
+    4.544204977279049,
+    3.274113923795595,
+    -1.415090884864249,
+    8.723824915409487
+  ],
+  "weights_hidden_output": [
+    [
+      12.018971115503918
+    ],
+    [
+      -11.985177862366028
+    ],
+    [
+      -5.868700719040609
+    ],
+    [
+      3.9473555793897974
+    ],
+    [
+      -15.713088692246211
+    ]
+  ],
+  "bias_output": [
+    2.371890801802121
+  ]
+}

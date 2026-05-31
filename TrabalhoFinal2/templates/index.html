@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reconhecimento de Digitos - MNIST</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --ok:#22c55e; --err:#ef4444; --text:#e2e8f0; --muted:#94a3b8; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg)); color: var(--text);
+      display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem;
+    }
+    h1 { font-size: 1.6rem; margin: 0 0 .3rem; text-align: center; }
+    .sub { color: var(--muted); margin: 0 0 2rem; text-align: center; font-size: .95rem; }
+    .card {
+      background: var(--card); border-radius: 18px; padding: 1.8rem; width: 100%; max-width: 720px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.45); display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem;
+    }
+    @media (max-width: 620px) { .card { grid-template-columns: 1fr; } }
+    .imgbox { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    #digit {
+      width: 224px; height: 224px; image-rendering: pixelated; border-radius: 12px;
+      background: #000; border: 1px solid #334155;
+    }
+    .placeholder { color: var(--muted); font-size:.9rem; margin-top:.8rem; }
+    .result { display:flex; flex-direction:column; justify-content:center; }
+    .pred-label { color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing:.08em; }
+    .pred-num { font-size: 5rem; font-weight: 800; line-height: 1; margin:.2rem 0; color: var(--accent); }
+    .conf { font-size: 1.05rem; }
+    .truth { margin-top: .9rem; font-size: .95rem; }
+    .badge { display:inline-block; padding:.18rem .6rem; border-radius:999px; font-size:.8rem; font-weight:600; margin-left:.4rem; }
+    .badge.ok { background: rgba(34,197,94,.15); color: var(--ok); }
+    .badge.err { background: rgba(239,68,68,.15); color: var(--err); }
+    .bars { margin-top: 1.2rem; display:flex; flex-direction:column; gap:.28rem; }
+    .bar-row { display:flex; align-items:center; gap:.5rem; font-size:.78rem; }
+    .bar-row span.lbl { width: 14px; color: var(--muted); }
+    .bar-track { flex:1; background:#0f172a; border-radius:6px; overflow:hidden; height:14px; }
+    .bar-fill { height:100%; background: var(--accent); width:0; transition: width .4s ease; }
+    .bar-row span.val { width: 44px; text-align:right; color: var(--muted); }
+    button {
+      margin-top: 2rem; background: var(--accent); color:#0b1220; border:0; padding:.9rem 2rem;
+      font-size: 1.05rem; font-weight: 700; border-radius: 12px; cursor: pointer; transition: transform .08s, opacity .2s;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity:.6; cursor: default; }
+    footer { color: var(--muted); font-size:.8rem; margin-top: 1.5rem; text-align:center; }
+  </style>
+</head>
+<body>
+  <h1>Reconhecimento de Digitos Manuscritos</h1>
+  <p class="sub">CNN treinada na base MNIST &middot; sorteie uma imagem e veja a predicao da rede</p>
+
+  <div class="card">
+    <div class="imgbox">
+      <img id="digit" alt="Imagem do MNIST" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/pLvAAAAAElFTkSuQmCC">
+      <div class="placeholder" id="meta">Clique no botao para comecar</div>
+    </div>
+    <div class="result">
+      <div class="pred-label">A rede preve o numero</div>
+      <div class="pred-num" id="pred">?</div>
+      <div class="conf" id="conf">&nbsp;</div>
+      <div class="truth" id="truth">&nbsp;</div>
+      <div class="bars" id="bars"></div>
+    </div>
+  </div>
+
+  <button id="btn" onclick="sortear()">Sortear imagem</button>
+  <footer>Backend: Flask + PyTorch &middot; modelo DigitCNN</footer>
+
+  <script>
+    const bars = document.getElementById('bars');
+    for (let i = 0; i < 10; i++) {
+      bars.innerHTML += `<div class="bar-row"><span class="lbl">${i}</span>`
+        + `<div class="bar-track"><div class="bar-fill" id="fill${i}"></div></div>`
+        + `<span class="val" id="val${i}">0%</span></div>`;
+    }
+
+    async function sortear() {
+      const btn = document.getElementById('btn');
+      btn.disabled = true; btn.textContent = 'Classificando...';
+      try {
+        const r = await fetch('/predict');
+        const d = await r.json();
+        document.getElementById('digit').src = d.imagem;
+        document.getElementById('pred').textContent = d.predicao;
+        document.getElementById('conf').textContent = `confianca: ${d.confianca}%`;
+        document.getElementById('meta').textContent = `MNIST teste #${d.indice}`;
+        const badge = d.acertou
+          ? '<span class="badge ok">acertou</span>'
+          : '<span class="badge err">errou</span>';
+        document.getElementById('truth').innerHTML =
+          `rotulo verdadeiro: <b>${d.rotulo_verdadeiro}</b> ${badge}`;
+        d.distribuicao.forEach((p, i) => {
+          document.getElementById(`fill${i}`).style.width = p + '%';
+          document.getElementById(`val${i}`).textContent = p.toFixed(1) + '%';
+          document.getElementById(`fill${i}`).style.background =
+            (i == parseInt(d.predicao)) ? 'var(--accent)' : '#475569';
+        });
+      } catch (e) {
+        document.getElementById('meta').textContent = 'Erro ao classificar';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Sortear imagem';
+      }
+    }
+  </script>
+</body>
+</html>
